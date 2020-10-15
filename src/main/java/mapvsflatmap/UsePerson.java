@@ -1,15 +1,11 @@
 package mapvsflatmap;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("Convert2MethodRef")
 public class UsePerson {
-    private static List<String> names =
+    private static final List<String> names =
             Arrays.asList("Grace Hopper", "Frances Allen", "Ada Lovelace",
                           "Barbara Liskov", "Adele Goldberg", "Karen Spärck Jones");
 
@@ -65,23 +61,24 @@ public class UsePerson {
 
     // 1..5 | 6..10 | 11..15 | 16..20
     // add each element to LinkedList and return it (sequential)
-    // Say we are using a parallel stream with four processes
-    //  R1      R2      R3       R4
+    // Say we are using a parallel stream with four processors
+    //  R1     R2       R3       R4
     //               R
     public List<Person> createPersonListUsingNew() {
         return names.stream()
                     // .parallel()
                     .map(Person::new)
-                    .collect(LinkedList::new,
-                             LinkedList::add,
-                             LinkedList::addAll);
+                    .collect(LinkedList::new,     // Supplier<LinkedList>
+                             LinkedList::add,     // BiConsumer<LinkedList,Person>
+                             LinkedList::addAll); // BiConsumer<LinkedList,LinkedList>
     }
 
+    @SuppressWarnings("Convert2Diamond")
     public List<Person> createPersonListUsingNewWithLambdas() {
         return names.stream()
                     .map(Person::new)
                     .collect(() -> new LinkedList<Person>(),
-                             (people, e) -> people.add(e),
+                             (people, person) -> people.add(person),
                              (totalCollection, people) ->
                                      totalCollection.addAll(people)); // not called unless parallel
     }
